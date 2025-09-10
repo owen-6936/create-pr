@@ -49,6 +49,7 @@ jobs:
       - name: Create Pull Request
         uses: ./
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{github.ref_name}}
           base-branch: main
           title: ${{ needs.parse-commit-message.outputs.head_message }}

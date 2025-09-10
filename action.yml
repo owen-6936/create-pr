@@ -6,6 +6,9 @@ branding:
   color: "green"
 
 inputs:
+  github-token:
+    description: "The GitHub token to use for creating the pull request."
+    required: true
   branch:
     required: true
     description: "The branch from which the pull request is created."
@@ -56,4 +59,4 @@ runs:
 
         echo "Successfully created pull request #$pr_number at $pr_url"
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ inputs.github-token }}
