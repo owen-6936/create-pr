@@ -27,7 +27,9 @@ jobs:
             body_message=$(echo "$full_message" | tail -n +2)
 
             echo "head_message=$head_message" >> "$GITHUB_OUTPUT"
+            echo "body_message<<EOF" >> "$GITHUB_OUTPUT"
             echo "body_message=$body_message" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
             echo "is_multiline=true" >> "$GITHUB_OUTPUT"
           else
             head_message="$full_message"
