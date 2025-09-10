@@ -33,7 +33,6 @@ jobs:
             echo "is_multiline=true" >> "$GITHUB_OUTPUT"
           else
             head_message="$full_message"
-            body_message="This pull request was automatically created by a workflow."
 
             echo "head_message=$head_message" >> "$GITHUB_OUTPUT"
             echo "body_message=$body_message" >> "$GITHUB_OUTPUT"
