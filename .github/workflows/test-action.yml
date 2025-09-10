@@ -10,10 +10,8 @@ jobs:
   parse-commit-message:
     runs-on: ubuntu-latest
     outputs:
-      head_message:
-        value: ${{ steps.commit-message-parser.outputs.head_message }}
-      body_message:
-        value: ${{ steps.commit-message-parser.outputs.body_message }}
+      head_message: ${{ steps.commit-message-parser.outputs.head_message }}
+      body_message: ${{ steps.commit-message-parser.outputs.body_message }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
