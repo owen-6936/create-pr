@@ -64,6 +64,10 @@ jobs:
 
 ### ⚠️ Important: GitHub Actions Permissions
 
+This action requires read and write permissions for the workflow to function correctly. Without write permissions, the GITHUB_TOKEN will be unable to create a pull request.
+
+You can configure this setting in your repository's settings under Settings > Actions > General > Workflow permissions.
+
 To allow this action to create a pull request, you must enable the `Allow GitHub Actions to create and approve pull requests` setting for your repository.
 
 You can find this option in your repository's settings under **Settings > Actions > General**.
