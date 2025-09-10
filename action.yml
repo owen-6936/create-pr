@@ -48,9 +48,10 @@ runs:
 
         body_template+="### Workflow Metadata\n- Triggered by: \`${{ github.workflow }}\`\n- Commit: \`${{ github.sha }}\`\n- Actor: \`${{ github.actor }}\`"
 
-        pr_data=$(gh pr create \
+        # Use --body-file - to correctly render newlines and Markdown
+        pr_data=$(echo "$body_template" | gh pr create \
           --title "${{ inputs.title }}" \
-          --body "$body_template" \
+          --body-file - \
           --base "${{ inputs.base-branch }}" \
           --head "${{ inputs.branch }}")
 
