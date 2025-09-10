@@ -10,10 +10,8 @@ jobs:
   parse-commit-message:
     runs-on: ubuntu-latest
     outputs:
-      head_message:
-        value: ${{ steps.commit-message-parser.outputs.head_message }}
-      body_message:
-        value: ${{ steps.commit-message-parser.outputs.body_message }}
+      head_message: ${{ steps.commit-message-parser.outputs.head_message }}
+      body_message: ${{ steps.commit-message-parser.outputs.body_message }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -29,7 +27,9 @@ jobs:
             body_message=$(echo "$full_message" | tail -n +2)
 
             echo "head_message=$head_message" >> "$GITHUB_OUTPUT"
+            echo "body_message<<EOF" >> "$GITHUB_OUTPUT"
             echo "body_message=$body_message" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
             echo "is_multiline=true" >> "$GITHUB_OUTPUT"
           else
             head_message="$full_message"
@@ -49,6 +49,7 @@ jobs:
       - name: Create Pull Request
         uses: ./
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{github.ref_name}}
           base-branch: main
           title: ${{ needs.parse-commit-message.outputs.head_message }}
