@@ -62,6 +62,14 @@ jobs:
 
 ---
 
+### ⚠️ Important: GitHub Actions Permissions
+
+To allow this action to create a pull request, you must enable the `Allow GitHub Actions to create and approve pull requests` setting for your repository.
+
+You can find this option in your repository's settings under **Settings > Actions > General**.
+
+---
+
 ### Contributing
 
 All contributions are welcome\! If you find a bug or have a feature request, please open an issue or submit a pull request.
