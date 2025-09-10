@@ -22,14 +22,16 @@ jobs:
         run: |
           full_message="${{ github.event.head_commit.message }}"
 
-          if echo "$full_message" | grep -q '\n'; then
-            head_message=$(echo "$full_message" | head -n 1)
-            body_message=$(echo "$full_message" | tail -n +2)
+          if [ "$(printf "%s" "$full_message" | wc -l)" -gt 1 ]; then
+            head_message=$(printf "%s" "$full_message" | head -n 1)
+            body_message=$(printf "%s" "$full_message" | tail -n +2)
 
             echo "head_message=$head_message" >> "$GITHUB_OUTPUT"
-            echo "body_message<<EOF" >> "$GITHUB_OUTPUT"
-            echo "body_message=$body_message" >> "$GITHUB_OUTPUT"
-            echo "EOF" >> "$GITHUB_OUTPUT"
+            {
+              echo "body_message<<EOF"
+              echo "$body_message"
+              echo "EOF"
+            } >> "$GITHUB_OUTPUT"
             echo "is_multiline=true" >> "$GITHUB_OUTPUT"
           else
             head_message="$full_message"
