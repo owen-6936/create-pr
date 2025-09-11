@@ -56,3 +56,4 @@ jobs:
           base-branch: main
           title: ${{ needs.parse-commit-message.outputs.head_message }}
           body: ${{ needs.parse-commit-message.outputs.body_message }}
+          comment-body: "Created this PR as part of an automated test"

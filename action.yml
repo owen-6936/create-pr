@@ -1,5 +1,5 @@
 name: Automate Pull Request Creation
-description: "Automates the creation of pull requests from a branch, including setting the title, body, and base branch."
+description: "Creates a pull request from a branch and optionally adds labels and a comment."
 author: "owen-6936"
 branding:
   icon: "git-pull-request"
@@ -7,29 +7,43 @@ branding:
 
 inputs:
   github-token:
-    description: "The GitHub token to use for creating the pull request."
+    description: "GitHub token for authentication."
     required: true
+
   branch:
+    description: "Source branch for the pull request."
     required: true
-    description: "The branch from which the pull request is created."
+
   base-branch:
-    description: "The base branch to create the pull request against."
+    description: "Target branch for the pull request."
     required: true
+
   title:
-    description: "The title for the new pull request."
+    description: "Title of the pull request."
+    required: false
     default: "PR created by automated workflow"
-    required: false
+
   body:
-    description: "The body content for the new pull request."
-    default: "This pull request was automatically created by a workflow."
+    description: "Body content of the pull request."
     required: false
+    default: "This pull request was automatically created by a workflow."
+
+  labels:
+    description: "Comma-separated list of labels to apply."
+    required: false
+    default: "automated"
+
+  comment-body:
+    description: "Optional comment to post after PR creation."
+    required: false
+    default: ""
 
 outputs:
   pr_number:
-    description: "The number of the created pull request."
+    description: "Number of the created pull request."
     value: ${{ steps.create-pr.outputs.pr_number }}
   pr_url:
-    description: "The URL of the created pull request."
+    description: "URL of the created pull request."
     value: ${{ steps.create-pr.outputs.pr_url }}
 
 runs:
@@ -39,24 +53,36 @@ runs:
       id: create-pr
       shell: bash
       run: |
-        # The `gh pr create` command prints the PR URL to standard output
+        set -e
+
+        pr_body_md=$(printf "## 🤖 Automated PR\n\nThis pull request was generated from branch \`%s\`\n\n%s\n\n### Workflow Metadata\n- Triggered by: \`%s\`\n- Commit: \`%s\`\n- Actor: \`%s\`" \
+          "${{ inputs.branch }}" \
+          "${{ inputs.body }}" \
+          "${{ github.workflow }}" \
+          "${{ github.sha }}" \
+          "${{ github.actor }}")
+
         pr_url=$(gh pr create \
           --title "${{ inputs.title }}" \
-          --body "$(printf "## 🤖 Automated PR\n\nThis pull request was generated from branch \`%s\`\n\n%s\n\n### Workflow Metadata\n- Triggered by: \`%s\`\n- Commit: \`%s\`\n- Actor: \`%s\`" \
-            "${{ inputs.branch }}" \
-            "${{ inputs.body }}" \
-            "${{ github.workflow }}" \
-            "${{ github.sha }}" \
-            "${{ github.actor }}")" \
+          --body "$pr_body_md" \
           --base "${{ inputs.base-branch }}" \
-          --head "${{ inputs.branch }}")
+          --head "${{ inputs.branch }}" \
+          --label "${{ inputs.labels }}" \
+          --repo "${{ github.repository }}")
 
-        # Extract the pull request number from the URL
         pr_number=$(basename "$pr_url")
 
         echo "pr_number=$pr_number" >> "$GITHUB_OUTPUT"
         echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
 
-        echo "Successfully created pull request #$pr_number at $pr_url"
+        echo "✅ Created PR #$pr_number at $pr_url"
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+
+    - name: Add Comment to PR
+      if: ${{ inputs.comment-body != '' }}
+      shell: bash
+      run: |
+        gh pr comment "$pr_url" --body "${{ inputs.comment-body }}"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
