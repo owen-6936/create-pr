@@ -67,7 +67,6 @@ runs:
           --body "$pr_body_md" \
           --base "${{ inputs.base-branch }}" \
           --head "${{ inputs.branch }}" \
-          --label "${{ inputs.labels }}" \
           --repo "${{ github.repository }}")
 
         pr_number=$(basename "$pr_url")
@@ -76,6 +75,21 @@ runs:
         echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
 
         echo "✅ Created PR #$pr_number at $pr_url"
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
+
+    - name: Ensure Labels Exist and Apply
+      shell: bash
+      run: |
+        IFS=',' read -ra label_array <<< "${{ inputs.labels }}"
+        for label in "${label_array[@]}"; do
+          if ! gh label list --repo "${{ github.repository }}" | grep -q "^$label"; then
+            echo "🔧 Creating missing label: $label"
+            gh label create "$label" --repo "${{ github.repository }}" --color "cfd3d7" --description "Auto-created by workflow"
+          fi
+        done
+
+        gh pr edit "$pr_url" --add-label "${{ inputs.labels }}"
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
