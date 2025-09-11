@@ -1,14 +1,24 @@
-# Automate Pull Request Creation 🤖
+# 🤖 Automate Pull Request Creation
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/owen-6936/create-pr?style=for-the-badge)](https://github.com/owen-6936/create-pr/releases) [![Build Status - develop](https://img.shields.io/github/actions/workflow/status/owen-6936/create-pr/test-action.yml?branch=develop&style=for-the-badge)](https://github.com/owen-6936/create-pr/actions/workflows/test-action.yml) [![License](https://img.shields.io/github/license/owen-6936/create-pr?style=for-the-badge)](https://github.com/owen-6936/create-pr/blob/main/LICENSE)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/owen-6936/create-pr?style=for-the-badge)](https://github.com/owen-6936/create-pr/releases)  
+[![Build Status - develop](https://img.shields.io/github/actions/workflow/status/owen-6936/create-pr/test-action.yml?branch=develop&style=for-the-badge)](https://github.com/owen-6936/create-pr/actions/workflows/test-action.yml)  
+[![License](https://img.shields.io/github/license/owen-6936/create-pr?style=for-the-badge)](https://github.com/owen-6936/create-pr/blob/main/LICENSE)
 
-This GitHub Action automates the creation of a new pull request. It is designed to be used in continuous integration workflows to programmatically create a pull request from a branch, including setting the title, body, and base branch.
+A GitHub Action that programmatically creates a pull request from a branch — with optional metadata injection including labels and comments. Designed for CI workflows that prioritize clarity, authorship integrity, and reviewer experience.
 
 ---
 
-## Usage
+## ✨ Features
 
-This action is used within a GitHub Actions workflow. The simplest use case involves calling the action with its required inputs.
+- Creates a pull request from a source branch to a target branch
+- Injects markdown-formatted body with workflow metadata
+- Applies labels (auto-creates if missing)
+- Posts a comment to the PR (optional)
+- Outputs PR number and URL for downstream use
+
+---
+
+## 🚀 Usage
 
 ```yaml
 name: Example Workflow
@@ -27,65 +37,80 @@ jobs:
 
       - name: Create Pull Request
         id: pr-creation
-        uses: owen-6936/create-pr@v1.0.0
+        uses: owen-6936/create-pr@v1.1.0
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref_name }}
           base-branch: 'main'
           title: 'Automated PR from ${{ github.ref_name }}'
           body: 'This PR was automatically created by a workflow.'
+          labels: 'automated,ci-pending'
+          comment-body: '✅ Code quality checks will run shortly. [View PR](${{ steps.pr-creation.outputs.pr_url }})'
 
       - name: Check the new PR
         run: |
           echo "Successfully created pull request #${{ steps.pr-creation.outputs.pr_number }}"
           echo "URL: ${{ steps.pr-creation.outputs.pr_url }}"
-````
+```
 
 ---
 
-### Inputs
+## 🔧 Inputs
 
-| Input | Description | Required | Default |
-|---|---|---|---|
-| `branch` | The branch from which the pull request is created. | `true` | |
-| `base-branch` | The base branch to create the pull request against. | `true` | |
-| `title` | The title for the new pull request. | `false` | `PR created by automated workflow` |
-| `body` | The body content for the new pull request. | `false` | `This pull request was automatically created by a workflow.` |
-
----
-
-### Outputs
-
-| Output | Description |
-|---|---|
-| `pr_number` | The number of the created pull request. |
-| `pr_url` | The URL of the created pull request. |
+| Name           | Description                                                  | Required | Default                                      |
+|----------------|--------------------------------------------------------------|----------|----------------------------------------------|
+| `github-token` | GitHub token for authentication                              | ✅       | —                                            |
+| `branch`       | Source branch for the pull request                           | ✅       | —                                            |
+| `base-branch`  | Target branch for the pull request                           | ✅       | —                                            |
+| `title`        | Title of the pull request                                    | ❌       | `PR created by automated workflow`           |
+| `body`         | Body content of the pull request                             | ❌       | `This pull request was automatically created by a workflow.` |
+| `labels`       | Comma-separated list of labels to apply                      | ❌       | `automated`                                  |
+| `comment-body` | Optional comment to post after PR creation                   | ❌       | *(none)*                                     |
 
 ---
 
-### ⚠️ Important: GitHub Actions Permissions
+## 🧪 Outputs
 
-This action requires read and write permissions for the workflow to function correctly. Without write permissions, the GITHUB_TOKEN will be unable to create a pull request.
-
-You can configure this setting in your repository's settings under Settings > Actions > General > Workflow permissions.
-
-To allow this action to create a pull request, you must enable the `Allow GitHub Actions to create and approve pull requests` setting for your repository.
-
-You can find this option in your repository's settings under **Settings > Actions > General**.
+| Name       | Description                          |
+|------------|--------------------------------------|
+| `pr_number`| Number of the created pull request   |
+| `pr_url`   | URL of the created pull request      |
 
 ---
 
-### Contributing
+## 🛡️ Integrity & Permissions
 
-All contributions are welcome\! If you find a bug or have a feature request, please open an issue or submit a pull request.
+This action respects authorship boundaries:
+
+- Labels are auto-created if missing
+- Comments are only posted if explicitly provided
+- No edits are made to existing PRs — this action only runs when it authors the PR
+
+Make sure your workflow has **write permissions** enabled:
+
+```yaml
+permissions:
+  contents: write
+  pull-requests: write
+```
+
+You can configure this under **Settings > Actions > General > Workflow permissions**.
 
 ---
 
-### License
+## 🤝 Contributing
+
+All contributions are welcome! If you find a bug or have a feature request, feel free to open an issue or submit a pull request.
+
+---
+
+## 📄 License
 
 This project is licensed under the MIT License.
 
 ---
 
-### About the Author
+## 👤 About the Author
 
-This project was created by **Owen**, a full-stack developer passionate about automation and JavaScript(Typescript). You can find more of my work on my GitHub profile: [https://github.com/owen-6936](https://github.com/owen-6936).
+Created by **Owen**, a full-stack developer focused on modular CI/CD, expressive automation, and reviewer-centric DX.  
+Explore more of my work at [github.com/owen-6936](https://github.com/owen-6936)
